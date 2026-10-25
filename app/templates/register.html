@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-lg-6 col-md-8">
+    <div class="cyber-card">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3);">
+          <i class="bi bi-shield-plus text-cyan fs-3"></i>
+        </div>
+        <h2 class="h4 fw-bold text-light">Create Secure Account</h2>
+        <p class="text-muted small">Register for identity protection and verified session credentials.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}" novalidate id="registerForm">
+        {{ form.hidden_tag() }}
+
+        <!-- Username Input -->
+        <div class="mb-3">
+          <label for="username" class="form-label">
+            <i class="bi bi-person me-1 text-cyan"></i>{{ form.username.label.text }}
+          </label>
+          {{ form.username(
+              class="form-control" + (" is-invalid" if form.username.errors else ""),
+              id="username",
+              placeholder="e.g. cyber_analyst_01",
+              autocomplete="username",
+              required=True
+          ) }}
+          {% if form.username.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.username.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text text-subtle small">Letters, numbers, dots, hyphens, and underscores only.</div>
+        </div>
+
+        <!-- Email Input -->
+        <div class="mb-3">
+          <label for="email" class="form-label">
+            <i class="bi bi-envelope me-1 text-cyan"></i>{{ form.email.label.text }}
+          </label>
+          {{ form.email(
+              class="form-control" + (" is-invalid" if form.email.errors else ""),
+              id="email",
+              placeholder="you@domain.com",
+              autocomplete="email",
+              required=True
+          ) }}
+          {% if form.email.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.email.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Password Input -->
+        <div class="mb-3">
+          <label for="password" class="form-label">
+            <i class="bi bi-lock me-1 text-cyan"></i>{{ form.password.label.text }}
+          </label>
+          <div class="input-group">
+            {{ form.password(
+                class="form-control" + (" is-invalid" if form.password.errors else ""),
+                id="password",
+                placeholder="Minimum 8 characters with mixed case, number & symbol",
+                autocomplete="new-password",
+                required=True
+            ) }}
+            <button class="btn btn-cyber-secondary toggle-password-btn" type="button" data-target="password" title="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% if form.password.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.password.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Dynamic Password Strength Feedback -->
+          <div class="password-meter mt-2">
+            <div class="password-meter-bar" id="passwordMeterBar"></div>
+          </div>
+          <ul class="password-checklist" id="passwordChecklist">
+            <li id="reqLength"><i class="bi bi-circle"></i> At least 8 characters</li>
+            <li id="reqUpper"><i class="bi bi-circle"></i> At least 1 uppercase letter (A-Z)</li>
+            <li id="reqLower"><i class="bi bi-circle"></i> At least 1 lowercase letter (a-z)</li>
+            <li id="reqNumber"><i class="bi bi-circle"></i> At least 1 numeric digit (0-9)</li>
+            <li id="reqSpecial"><i class="bi bi-circle"></i> At least 1 special character (!@#$%^&*)</li>
+          </ul>
+        </div>
+
+        <!-- Confirm Password Input -->
+        <div class="mb-4">
+          <label for="confirm_password" class="form-label">
+            <i class="bi bi-lock-fill me-1 text-cyan"></i>{{ form.confirm_password.label.text }}
+          </label>
+          <div class="input-group">
+            {{ form.confirm_password(
+                class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                id="confirm_password",
+                placeholder="Re-enter password exactly",
+                autocomplete="new-password",
+                required=True
+            ) }}
+            <button class="btn btn-cyber-secondary toggle-password-btn" type="button" data-target="confirm_password" title="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% if form.confirm_password.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.confirm_password.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-cyber-primary py-2" id="registerSubmitBtn">
+            <i class="bi bi-shield-check me-1"></i> Register Account
+          </button>
+        </div>
+
+        <div class="text-center text-muted small">
+          Already have verified credentials?
+          <a href="{{ url_for('auth.login') }}" class="text-cyan fw-semibold ms-1" id="loginRedirectLink">Sign In here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

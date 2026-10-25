@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-lg-6 text-center">
+    <div class="cyber-card py-5">
+      <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3);">
+        <i class="bi bi-shield-slash text-rose fs-1"></i>
+      </div>
+      <h1 class="h3 fw-bold text-light mb-2">403 - Access Forbidden</h1>
+      <p class="text-muted small mb-4">
+        {{ message or "You do not have administrative privileges required to access this protected resource." }}
+      </p>
+      <div class="code-pill mb-4 d-inline-block">Security Defense: OWASP A01 - Broken Access Control & RBAC Enforcement</div>
+      <div>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-cyber-primary btn-sm">
+          <i class="bi bi-speedometer2 me-1"></i> Return to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

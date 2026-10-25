@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <!-- Profile & Security Header -->
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 64px; height: 64px; background: rgba(0, 245, 212, 0.1); border: 2px solid var(--accent-cyan);">
+            <i class="bi bi-person-bounding-box fs-2 text-cyan"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h2 class="h4 fw-bold text-light m-0" id="dashUsername">{{ user.username }}</h2>
+              {% if user.is_admin() %}
+                <span class="badge-role-admin" id="dashRoleBadge">Administrator</span>
+              {% else %}
+                <span class="badge-role-user" id="dashRoleBadge">Standard User</span>
+              {% endif %}
+              <span class="badge-status-active"><i class="bi bi-circle-fill me-1 small"></i>Active</span>
+            </div>
+            <div class="text-muted small mt-1 font-mono" id="dashEmail">
+              <i class="bi bi-envelope me-1"></i>{{ user.email }}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ url_for('main.profile') }}" class="btn btn-cyber-secondary btn-sm" id="dashEditProfileBtn">
+            <i class="bi bi-gear me-1"></i> Edit Profile
+          </a>
+          <a href="{{ url_for('main.change_password') }}" class="btn btn-cyber-secondary btn-sm" id="dashChangePassBtn">
+            <i class="bi bi-shield-lock me-1"></i> Change Password
+          </a>
+          {% if user.is_admin() %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-cyber-primary btn-sm" id="dashAdminPortalBtn">
+              <i class="bi bi-cpu me-1"></i> Admin Portal
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telemetry and Security Metrics Cards -->
+  <div class="col-md-4">
+    <div class="cyber-card h-100">
+      <div class="d-flex align-items-center gap-2 text-cyan mb-3">
+        <i class="bi bi-shield-check fs-4"></i>
+        <h3 class="h6 fw-bold m-0 text-light">Authentication Telemetry</h3>
+      </div>
+      <ul class="list-unstyled mb-0 small">
+        <li class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+          <span class="text-muted">Account Registered:</span>
+          <span class="text-light font-mono">{{ user.created_at.strftime('%Y-%m-%d %H:%M UTC') }}</span>
+        </li>
+        <li class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+          <span class="text-muted">Last Successful Login:</span>
+          <span class="text-light font-mono">
+            {% if user.last_login %}{{ user.last_login.strftime('%Y-%m-%d %H:%M UTC') }}{% else %}First Session{% endif %}
+          </span>
+        </li>
+        <li class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+          <span class="text-muted">Password Algorithm:</span>
+          <span class="text-cyan font-mono">scrypt (OWASP A02)</span>
+        </li>
+        <li class="d-flex justify-content-between py-2">
+          <span class="text-muted">Session Expiration:</span>
+          <span class="text-light font-mono">30 minutes idle</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="cyber-card h-100">
+      <div class="d-flex align-items-center gap-2 text-cyan mb-3">
+        <i class="bi bi-lock-fill fs-4"></i>
+        <h3 class="h6 fw-bold m-0 text-light">Active Session Defenses</h3>
+      </div>
+      <div class="d-flex flex-column gap-2 small">
+        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(0,0,0,0.3);">
+          <span><i class="bi bi-check2-circle text-success me-1"></i> HttpOnly Cookie Flag</span>
+          <span class="code-pill">Anti-XSS Hijack</span>
+        </div>
+        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(0,0,0,0.3);">
+          <span><i class="bi bi-check2-circle text-success me-1"></i> SameSite=Lax Attribute</span>
+          <span class="code-pill">Anti-CSRF Cookie</span>
+        </div>
+        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(0,0,0,0.3);">
+          <span><i class="bi bi-check2-circle text-success me-1"></i> Session Fixation Guard</span>
+          <span class="code-pill">Regenerated on Login</span>
+        </div>
+        <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(0,0,0,0.3);">
+          <span><i class="bi bi-check2-circle text-success me-1"></i> Content Security Policy</span>
+          <span class="code-pill">Strict CSP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="cyber-card h-100">
+      <div class="d-flex align-items-center gap-2 text-cyan mb-3">
+        <i class="bi bi-person-lines-fill fs-4"></i>
+        <h3 class="h6 fw-bold m-0 text-light">User Profile Scope</h3>
+      </div>
+      <div class="mb-2">
+        <div class="text-muted small">Registered Email:</div>
+        <div class="text-light small font-mono">{{ user.email }}</div>
+      </div>
+      <div class="mb-3">
+        <div class="text-muted small">Bio / About:</div>
+        <div class="text-light small font-italic">
+          {% if user.bio %}{{ user.bio }}{% else %}<span class="text-subtle">No bio provided.</span>{% endif %}
+        </div>
+      </div>
+      <div class="p-2 rounded small text-subtle" style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-subtle);">
+        <i class="bi bi-shield-lock me-1 text-cyan"></i> IDOR Protected: User profile data is bound directly to the authenticated session principal.
+      </div>
+    </div>
+  </div>
+
+  <!-- User Personal Security Activity Logs -->
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-journal-code text-cyan fs-5"></i>
+          <h3 class="h6 fw-bold m-0 text-light">Your Personal Security Activity Trail</h3>
+        </div>
+        <span class="text-subtle small font-mono">Bound to User ID: #{{ user.id }}</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-cyber" id="userLogsTable">
+          <thead>
+            <tr>
+              <th>Timestamp (UTC)</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>IP Address</th>
+              <th>Event Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in user_logs %}
+              <tr>
+                <td class="font-mono text-muted small">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td><span class="code-pill">{{ log.action }}</span></td>
+                <td>
+                  {% if log.status == 'SUCCESS' %}
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">SUCCESS</span>
+                  {% elif log.status == 'FAILURE' %}
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">FAILURE</span>
+                  {% else %}
+                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25">{{ log.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-cyan small">{{ log.ip_address or '127.0.0.1' }}</td>
+                <td class="text-muted small">{{ log.details or 'Standard authenticated action.' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-3">No activity logs recorded yet for this account.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+  <div class="col-lg-6 text-center">
+    <div class="cyber-card py-5">
+      <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);">
+        <i class="bi bi-hourglass-split text-amber fs-1"></i>
+      </div>
+      <h1 class="h3 fw-bold text-light mb-2">429 - Rate Limit Exceeded</h1>
+      <p class="text-muted small mb-4">
+        {{ message or "Too many requests submitted in a short interval. Automated rate limiting is active to protect against brute-force attacks and denial-of-service." }}
+      </p>
+      <div class="code-pill mb-4 d-inline-block">Security Defense: OWASP A04 / A07 - Anti-Brute-Force Throttle</div>
+      <div>
+        <a href="{{ url_for('main.index') }}" class="btn btn-cyber-primary btn-sm">
+          <i class="bi bi-house-door me-1"></i> Return Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge-role-admin">SECURITY TELEMETRY</span>
+          </div>
+          <h2 class="h4 fw-bold text-light m-0">Forensic Audit Trail & Event Logs</h2>
+          <p class="text-muted small m-0">Immutable records of authentication events, authorization checks, and administrative modifications.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <!-- Status Filter Buttons -->
+          <div class="btn-group btn-group-sm">
+            <a href="{{ url_for('admin.audit_logs') }}" class="btn {% if not status_filter %}btn-cyber-primary{% else %}btn-cyber-secondary{% endif %}">
+              All
+            </a>
+            <a href="{{ url_for('admin.audit_logs', status='SUCCESS') }}" class="btn {% if status_filter == 'SUCCESS' %}btn-cyber-primary{% else %}btn-cyber-secondary{% endif %}">
+              Success
+            </a>
+            <a href="{{ url_for('admin.audit_logs', status='WARNING') }}" class="btn {% if status_filter == 'WARNING' %}btn-cyber-primary{% else %}btn-cyber-secondary{% endif %}">
+              Warning
+            </a>
+            <a href="{{ url_for('admin.audit_logs', status='FAILURE') }}" class="btn {% if status_filter == 'FAILURE' %}btn-cyber-primary{% else %}btn-cyber-secondary{% endif %}">
+              Failure
+            </a>
+          </div>
+
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-cyber-secondary btn-sm" id="backToAdminBtn">
+            <i class="bi bi-arrow-left me-1"></i> Control Center
+          </a>
+        </div>
+      </div>
+
+      <!-- Audit Logs Table -->
+      <div class="table-responsive">
+        <table class="table-cyber" id="auditLogsTable">
+          <thead>
+            <tr>
+              <th>Log ID</th>
+              <th>Timestamp (UTC)</th>
+              <th>Security Action</th>
+              <th>Status</th>
+              <th>Subject / Principal</th>
+              <th>Remote IP</th>
+              <th>Forensic Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs.items %}
+              <tr>
+                <td class="font-mono text-cyan small">#{{ log.id }}</td>
+                <td class="font-mono text-muted small">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td><span class="code-pill">{{ log.action }}</span></td>
+                <td>
+                  {% if log.status == 'SUCCESS' %}
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">SUCCESS</span>
+                  {% elif log.status == 'FAILURE' %}
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">FAILURE</span>
+                  {% else %}
+                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25">{{ log.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-light small">
+                  {% if log.username %}
+                    <i class="bi bi-person me-1 text-cyan"></i>{{ log.username }}
+                  {% else %}
+                    <span class="text-subtle font-italic">ANONYMOUS</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-cyan small">{{ log.ip_address or '127.0.0.1' }}</td>
+                <td class="text-muted small">{{ log.details or 'Standard security event.' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">No audit logs found matching selected criteria.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if logs.pages > 1 %}
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+          <div class="text-subtle small">
+            Page {{ logs.page }} of {{ logs.pages }} (Total events: {{ logs.total }})
+          </div>
+          <div class="btn-group btn-group-sm">
+            {% if logs.has_prev %}
+              <a href="{{ url_for('admin.audit_logs', page=logs.prev_num, status=status_filter) }}" class="btn btn-cyber-secondary">
+                <i class="bi bi-chevron-left"></i> Previous
+              </a>
+            {% endif %}
+            {% if logs.has_next %}
+              <a href="{{ url_for('admin.audit_logs', page=logs.next_num, status=status_filter) }}" class="btn btn-cyber-secondary">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

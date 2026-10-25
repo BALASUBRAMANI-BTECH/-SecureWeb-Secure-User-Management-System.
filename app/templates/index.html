@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="position-relative">
+  <div class="hero-glow"></div>
+
+  <!-- Hero Section -->
+  <div class="text-center py-5 my-2">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill" style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3);">
+      <i class="bi bi-shield-shaded text-cyan"></i>
+      <span class="small fw-semibold text-cyan">Enterprise Security Architecture</span>
+    </div>
+    <h1 class="hero-title mb-3">SecureWeb User Management</h1>
+    <p class="hero-subtitle mb-4">
+      A reference web application demonstrating secure user registration, session management,
+      role-based authorization, and proactive mitigations against the OWASP Top 10 web vulnerabilities.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-cyber-primary px-4 py-2" id="heroDashboardBtn">
+          <i class="bi bi-grid-fill"></i> Access Your Dashboard
+        </a>
+        {% if current_user.is_admin() %}
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-cyber-secondary px-4 py-2" id="heroAdminBtn">
+            <i class="bi bi-shield-lock"></i> Admin Portal
+          </a>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-cyber-primary px-4 py-2" id="heroRegisterBtn">
+          <i class="bi bi-person-plus"></i> Create Secure Account
+        </a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-cyber-secondary px-4 py-2" id="heroLoginBtn">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Telemetry Bar -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-3 col-6">
+      <div class="stat-box text-center">
+        <div class="stat-value text-cyan">{{ total_users }}</div>
+        <div class="stat-label">Registered Accounts</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-box text-center">
+        <div class="stat-value text-primary">scrypt</div>
+        <div class="stat-label">Hashing Algorithm</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-box text-center">
+        <div class="stat-value text-success">Active</div>
+        <div class="stat-label">CSRF Protection</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="stat-box text-center">
+        <div class="stat-value text-warning">Strict</div>
+        <div class="stat-label">RBAC & IDOR Control</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security Pillars / OWASP Top 10 Mitigation Grid -->
+  <div class="mb-5">
+    <div class="text-center mb-4">
+      <h2 class="h3 fw-bold text-light">Built-in OWASP Top 10 Defenses</h2>
+      <p class="text-muted small">Real security controls actively enforced in application logic, not cosmetic placeholders.</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- A01 Broken Access Control -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-door-closed fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Broken Access Control (A01)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Protected endpoints require server-verified sessions. Role-Based Access Control (RBAC) halts privilege escalation and unauthorized admin route access with HTTP 403 Forbidden.
+          </p>
+          <span class="code-pill">@admin_required</span>
+          <span class="code-pill">Anti-IDOR Profile Bounds</span>
+        </div>
+      </div>
+
+      <!-- A02 Cryptographic Failures -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-fingerprint fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Cryptographic Failures (A02)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Passwords hashed with Werkzeug's memory-hard <span class="text-cyan">scrypt</span> algorithm. Never stored in plaintext. Session cookies configured with <span class="text-cyan">HttpOnly</span> and <span class="text-cyan">SameSite=Lax</span>.
+          </p>
+          <span class="code-pill">scrypt Hashing</span>
+          <span class="code-pill">HttpOnly Cookies</span>
+        </div>
+      </div>
+
+      <!-- A03 Injection -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-code-slash fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Injection & SQLi (A03)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Full reliance on SQLAlchemy ORM parameterized queries eliminates string concatenation in SQL execution. Form inputs are strictly validated and normalized.
+          </p>
+          <span class="code-pill">SQLAlchemy ORM</span>
+          <span class="code-pill">Zero String Concat</span>
+        </div>
+      </div>
+
+      <!-- A04 Insecure Design / Rate Limiting -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-stopwatch fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Insecure Design & Brute Force (A04)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Adaptive rate limiting on authentication routes (5 attempts/min) throttles brute-force password guessing and automated credential stuffing attacks.
+          </p>
+          <span class="code-pill">Flask-Limiter</span>
+          <span class="code-pill">HTTP 429 Throttle</span>
+        </div>
+      </div>
+
+      <!-- A05 Security Misconfiguration -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-sliders fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Security Misconfiguration (A05)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Automated HTTP security headers injected on all responses (Content-Security-Policy, X-Frame-Options: DENY, X-Content-Type-Options: nosniff). Generic error handlers prevent stack trace leakage.
+          </p>
+          <span class="code-pill">Strict CSP</span>
+          <span class="code-pill">Anti-Clickjacking</span>
+        </div>
+      </div>
+
+      <!-- A07 Auth & Session Fixation -->
+      <div class="col-md-4">
+        <div class="cyber-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-2 text-cyan">
+            <i class="bi bi-key-fill fs-4"></i>
+            <h3 class="h6 fw-bold m-0 text-light">Identification Failures (A07)</h3>
+          </div>
+          <p class="text-muted small mb-2">
+            Generic authentication error messages prevent username enumeration. Old session IDs are invalidated upon login to defeat Session Fixation attacks.
+          </p>
+          <span class="code-pill">Session Invalidation</span>
+          <span class="code-pill">Anti-Enumeration</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Quick Start Demonstration Guide -->
+  <div class="cyber-card mb-4">
+    <h3 class="h5 fw-bold text-light mb-3">
+      <i class="bi bi-terminal text-cyan me-2"></i>Quick Verification & Local Testing
+    </h3>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="p-3 rounded" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle);">
+          <div class="fw-semibold text-cyan mb-1">1. Register an Account</div>
+          <p class="text-muted small mb-0">Navigate to Register, create a user with a strong password (at least 8 chars, mixed case, numbers & symbols).</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle);">
+          <div class="fw-semibold text-cyan mb-1">2. Explore Role Access</div>
+          <p class="text-muted small mb-0">Standard users can access their dashboard and profile, but cannot access <code>/admin</code> (receives 403 Forbidden).</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle);">
+          <div class="fw-semibold text-cyan mb-1">3. Create Administrator</div>
+          <p class="text-muted small mb-0">Run <code>flask create-admin</code> in terminal to initialize a secure administrator and unlock user governance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-lg-5 col-md-7">
+    <div class="cyber-card">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: rgba(0, 245, 212, 0.1); border: 1px solid rgba(0, 245, 212, 0.3);">
+          <i class="bi bi-shield-lock text-cyan fs-3"></i>
+        </div>
+        <h2 class="h4 fw-bold text-light">Authenticate Identity</h2>
+        <p class="text-muted small">Enter your credentials to initiate an encrypted session.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}" novalidate id="loginForm">
+        {{ form.hidden_tag() }}
+
+        <!-- Identifier Input (Username or Email) -->
+        <div class="mb-3">
+          <label for="login_id" class="form-label">
+            <i class="bi bi-person-badge me-1 text-cyan"></i>{{ form.login_id.label.text }}
+          </label>
+          {{ form.login_id(
+              class="form-control" + (" is-invalid" if form.login_id.errors else ""),
+              id="login_id",
+              placeholder="Username or registered email",
+              autocomplete="username",
+              required=True
+          ) }}
+          {% if form.login_id.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.login_id.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Password Input -->
+        <div class="mb-3">
+          <label for="password" class="form-label">
+            <i class="bi bi-key me-1 text-cyan"></i>{{ form.password.label.text }}
+          </label>
+          <div class="input-group">
+            {{ form.password(
+                class="form-control" + (" is-invalid" if form.password.errors else ""),
+                id="password",
+                placeholder="Enter password",
+                autocomplete="current-password",
+                required=True
+            ) }}
+            <button class="btn btn-cyber-secondary toggle-password-btn" type="button" data-target="password" title="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% if form.password.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.password.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Remember Me & Security Notes -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="form-check">
+            {{ form.remember_me(class="form-check-input bg-dark border-secondary", id="remember_me") }}
+            <label class="form-check-label text-muted small" for="remember_me">
+              {{ form.remember_me.label.text }}
+            </label>
+          </div>
+          <span class="text-subtle small" title="Rate limit active to stop brute force">
+            <i class="bi bi-shield-shaded text-cyan me-1"></i>Rate Limited
+          </span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-cyber-primary py-2" id="loginSubmitBtn">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Authorize & Sign In
+          </button>
+        </div>
+
+        <div class="text-center text-muted small">
+          Don't have an account yet?
+          <a href="{{ url_for('auth.register') }}" class="text-cyan fw-semibold ms-1" id="registerRedirectLink">Create one now</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Security Information Pill -->
+    <div class="text-center mt-3 text-subtle small">
+      <i class="bi bi-info-circle me-1"></i> Generic error messages protect against username harvesting.
+    </div>
+  </div>
+</div>
+{% endblock %}

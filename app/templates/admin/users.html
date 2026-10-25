@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge-role-admin">USER GOVERNANCE</span>
+          </div>
+          <h2 class="h4 fw-bold text-light m-0">Directory & Privilege Management</h2>
+          <p class="text-muted small m-0">Inspect user credentials, toggle administrative roles, and enforce security policies.</p>
+        </div>
+
+        <div>
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-cyber-secondary btn-sm" id="backToAdminBtn">
+            <i class="bi bi-arrow-left me-1"></i> Control Center
+          </a>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-responsive">
+        <table class="table-cyber" id="adminUsersTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Last Login</th>
+              <th class="text-end">Administrative Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr>
+                <td class="font-mono text-cyan small">#{{ u.id }}</td>
+                <td class="fw-medium text-light">
+                  {{ u.username }}
+                  {% if u.id == current_user.id %}
+                    <span class="badge bg-secondary ms-1 small" style="font-size: 0.65rem;">YOU</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-muted small">{{ u.email }}</td>
+                <td>
+                  {% if u.role == 'admin' %}
+                    <span class="badge-role-admin">ADMIN</span>
+                  {% else %}
+                    <span class="badge-role-user">USER</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if u.is_active_account %}
+                    <span class="badge-status-active"><i class="bi bi-circle-fill me-1 small"></i>Active</span>
+                  {% else %}
+                    <span class="badge-status-inactive"><i class="bi bi-slash-circle me-1 small"></i>Suspended</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-muted small">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                <td class="font-mono text-muted small">
+                  {% if u.last_login %}{{ u.last_login.strftime('%Y-%m-%d %H:%M') }}{% else %}<span class="text-subtle">Never</span>{% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-2 align-items-center">
+                    <!-- Toggle Role Form -->
+                    {% if u.id != current_user.id %}
+                      <form action="{{ url_for('admin.toggle_user_role', user_id=u.id) }}" method="POST" class="d-inline action-confirm m-0" data-action-name="toggle security role for '{{ u.username }}'">
+                        {{ form.hidden_tag() }}
+                        <button type="submit" class="btn btn-cyber-secondary btn-sm py-1 px-2" title="{% if u.role == 'admin' %}Demote to Standard User{% else %}Promote to Administrator{% endif %}">
+                          {% if u.role == 'admin' %}
+                            <i class="bi bi-arrow-down-circle text-warning me-1"></i> Demote
+                          {% else %}
+                            <i class="bi bi-arrow-up-circle text-cyan me-1"></i> Promote
+                          {% endif %}
+                        </button>
+                      </form>
+
+                      <!-- Toggle Account Status Form -->
+                      <form action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" method="POST" class="d-inline action-confirm m-0" data-action-name="{% if u.is_active_account %}suspend{% else %}reactivate{% endif %} account '{{ u.username }}'">
+                        {{ form.hidden_tag() }}
+                        <button type="submit" class="btn btn-cyber-secondary btn-sm py-1 px-2" title="{% if u.is_active_account %}Deactivate Account{% else %}Activate Account{% endif %}">
+                          {% if u.is_active_account %}
+                            <i class="bi bi-lock text-warning"></i>
+                          {% else %}
+                            <i class="bi bi-unlock text-success"></i>
+                          {% endif %}
+                        </button>
+                      </form>
+
+                      <!-- Delete User Form -->
+                      <form action="{{ url_for('admin.delete_user', user_id=u.id) }}" method="POST" class="d-inline action-confirm m-0" data-action-name="PERMANENTLY DELETE user '{{ u.username }}'">
+                        {{ form.hidden_tag() }}
+                        <button type="submit" class="btn btn-cyber-danger btn-sm py-1 px-2" title="Permanently delete account">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    {% else %}
+                      <span class="text-subtle small font-italic">Current Session (Protected)</span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

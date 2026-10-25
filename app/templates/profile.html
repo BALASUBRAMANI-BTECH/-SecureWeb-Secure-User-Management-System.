@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+  <div class="col-lg-6 col-md-8">
+    <div class="cyber-card">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(0, 245, 212, 0.1); border: 1px solid var(--accent-cyan);">
+          <i class="bi bi-person-gear text-cyan fs-4"></i>
+        </div>
+        <div>
+          <h2 class="h5 fw-bold text-light m-0">Profile Configuration</h2>
+          <p class="text-muted small m-0">Update your authorized contact credentials.</p>
+        </div>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="alert-cyber alert-cyber-info mb-4 py-2">
+        <i class="bi bi-shield-lock-fill text-info fs-5"></i>
+        <div class="small">
+          <strong class="text-light">Access Bound:</strong> Modifications are strictly bound to your authenticated account (<span class="text-cyan font-mono">{{ current_user.username }}</span>). Role elevation cannot be requested via profile updates.
+        </div>
+      </div>
+
+      <form method="POST" action="{{ url_for('main.profile') }}" novalidate id="profileForm">
+        {{ form.hidden_tag() }}
+
+        <!-- Read-only Account Properties -->
+        <div class="mb-3">
+          <label class="form-label text-muted">Username (Immutable)</label>
+          <input type="text" class="form-control text-muted" value="{{ current_user.username }}" disabled readonly>
+          <div class="form-text text-subtle small">Username is a fixed security principal identifier.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label text-muted">Assigned Security Role</label>
+          <input type="text" class="form-control text-muted" value="{{ current_user.role | upper }}" disabled readonly>
+        </div>
+
+        <!-- Email Field -->
+        <div class="mb-3">
+          <label for="email" class="form-label">
+            <i class="bi bi-envelope me-1 text-cyan"></i>{{ form.email.label.text }}
+          </label>
+          {{ form.email(
+              class="form-control" + (" is-invalid" if form.email.errors else ""),
+              id="email",
+              required=True
+          ) }}
+          {% if form.email.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.email.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Bio Field -->
+        <div class="mb-4">
+          <label for="bio" class="form-label">
+            <i class="bi bi-card-text me-1 text-cyan"></i>{{ form.bio.label.text }}
+          </label>
+          {{ form.bio(
+              class="form-control" + (" is-invalid" if form.bio.errors else ""),
+              id="bio",
+              rows=3,
+              placeholder="Tell us about yourself (optional)..."
+          ) }}
+          {% if form.bio.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.bio.errors %}
+                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text text-subtle small">Maximum 250 characters. HTML tags will be escaped.</div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-cyber-secondary" id="cancelProfileBtn">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </a>
+          <button type="submit" class="btn btn-cyber-primary" id="saveProfileBtn">
+            <i class="bi bi-check2-circle me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

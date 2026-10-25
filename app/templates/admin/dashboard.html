@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <!-- Admin Header -->
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge-role-admin">ADMIN CONTROL CENTER</span>
+            <span class="text-cyan small font-mono">Privilege Level: Tier-1 Root</span>
+          </div>
+          <h2 class="h4 fw-bold text-light m-0">System Governance & Telemetry</h2>
+          <p class="text-muted small m-0">Monitor active user sessions, role allocations, and security audit logs.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ url_for('admin.users_list') }}" class="btn btn-cyber-primary btn-sm" id="adminUsersBtn">
+            <i class="bi bi-people-fill me-1"></i> Manage Accounts
+          </a>
+          <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-cyber-secondary btn-sm" id="adminAuditBtn">
+            <i class="bi bi-journal-text me-1"></i> Security Journal
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Counters -->
+  <div class="col-lg-3 col-sm-6">
+    <div class="stat-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="stat-label">Total Accounts</span>
+        <i class="bi bi-people text-cyan fs-4"></i>
+      </div>
+      <div class="stat-value text-cyan" id="metricTotalUsers">{{ total_users }}</div>
+      <div class="text-subtle small mt-1">Total registered users</div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6">
+    <div class="stat-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="stat-label">Administrators</span>
+        <i class="bi bi-shield-lock text-purple fs-4"></i>
+      </div>
+      <div class="stat-value text-purple" id="metricAdminUsers">{{ admin_count }}</div>
+      <div class="text-subtle small mt-1">High-privilege operators</div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6">
+    <div class="stat-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="stat-label">Standard Users</span>
+        <i class="bi bi-person-check text-emerald fs-4"></i>
+      </div>
+      <div class="stat-value text-emerald" id="metricStandardUsers">{{ standard_users }}</div>
+      <div class="text-subtle small mt-1">Restricted privilege users</div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-sm-6">
+    <div class="stat-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="stat-label">Security Alerts</span>
+        <i class="bi bi-exclamation-triangle text-amber fs-4"></i>
+      </div>
+      <div class="stat-value text-amber" id="metricWarningLogs">{{ warning_logs }}</div>
+      <div class="text-subtle small mt-1">Failed logins & warnings</div>
+    </div>
+  </div>
+
+  <!-- Recent System Security Events -->
+  <div class="col-12">
+    <div class="cyber-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-activity text-cyan fs-5"></i>
+          <h3 class="h6 fw-bold m-0 text-light">Real-Time Security Activity Stream</h3>
+        </div>
+        <a href="{{ url_for('admin.audit_logs') }}" class="text-cyan small text-decoration-none">
+          View Full Journal <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-cyber" id="recentAuditTable">
+          <thead>
+            <tr>
+              <th>Timestamp (UTC)</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Principal</th>
+              <th>IP Address</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in recent_logs %}
+              <tr>
+                <td class="font-mono text-muted small">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td><span class="code-pill">{{ log.action }}</span></td>
+                <td>
+                  {% if log.status == 'SUCCESS' %}
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">SUCCESS</span>
+                  {% elif log.status == 'FAILURE' %}
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">FAILURE</span>
+                  {% else %}
+                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25">{{ log.status }}</span>
+                  {% endif %}
+                </td>
+                <td class="font-mono text-light small">
+                  {% if log.username %}{{ log.username }}{% else %}<span class="text-subtle">ANONYMOUS</span>{% endif %}
+                </td>
+                <td class="font-mono text-cyan small">{{ log.ip_address or '127.0.0.1' }}</td>
+                <td class="text-muted small">{{ log.details or 'Security event logged.' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-3">No system security events logged yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
